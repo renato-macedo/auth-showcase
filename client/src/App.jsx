@@ -1,24 +1,34 @@
-import React, { useContext } from 'react';
-
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
 import Login from './components/Login';
-import AuthProvider, { AuthContext } from './context/AuthContext';
+import AuthProvider from './context/AuthContext';
 import Home from './components/Home';
+import PrivateRoute from './components/PrivateRoute';
 
-function App() {
-  const { isAuthenticated } = useContext(AuthContext);
-
-  if (isAuthenticated) {
-    return <Home />;
-  }
-  return <Login />;
-}
-
-function AppWithProvider() {
+export default function App() {
   return (
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <Switch>
+          <Route exact path="//">
+            <Login />
+          </Route>
+          <PrivateRoute exact path="/home">
+            <Home />
+          </PrivateRoute>
+
+          <Route path="*">
+            <h3>Not found</h3>
+          </Route>
+        </Switch>
+      </AuthProvider>
+    </Router>
   );
 }
-export default AppWithProvider;
+
+// export default () => (
+//   <AuthProvider>
+//     <App />
+//   </AuthProvider>
+// );

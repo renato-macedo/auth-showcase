@@ -1,5 +1,6 @@
 TO DO
 
 - [x] Access Token
-- [ ] Refresh Token
-- [ ] Cookies
+- [x] Refresh Token
+- [x] Cookie
+- [ ] Persist session after reload

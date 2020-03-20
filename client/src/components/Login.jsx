@@ -21,7 +21,6 @@ export default function Login() {
       <label htmlFor="inputEmail" className="sr-only">
         Email address
       </label>
-      {email}
       <input
         type="email"
         onChange={e => setEmail(e.target.value)}
@@ -33,7 +32,6 @@ export default function Login() {
       <label htmlFor="inputPassword" className="sr-only">
         Password
       </label>
-      {password}
       <input
         type="password"
         id="inputPassword"
@@ -54,7 +52,7 @@ export default function Login() {
         </label>
       </div>
       <button className="btn btn-lg btn-primary btn-block" type="submit">
-        Sign in {remember ? 'ok' : 'droga'}
+        Sign in
       </button>
       <p className="mt-5 mb-3 text-muted">&copy; Renato Macêdo</p>
     </form>
