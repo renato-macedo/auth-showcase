@@ -4,7 +4,7 @@ const router = require('express').Router();
 const crypto = require('crypto');
 
 const jwtMiddleware = require('./middlewares/jwt');
-const { TOKEN_SECRET, COOKIE_MAX_AGE } = require('./config');
+const { TOKEN_SECRET, COOKIE_MAX_AGE, EXPIRY_TIME } = require('./config');
 
 const SignAsync = promisify(jwt.sign);
 
@@ -16,7 +16,7 @@ router.post('/api/login', async (req, res) => {
 
   // sign the jwt
   const token = await SignAsync({ email }, TOKEN_SECRET, {
-    expiresIn: '10s'
+    expiresIn: EXPIRY_TIME
   });
 
   // if the user wants to be remembered
@@ -66,7 +66,7 @@ router.get('/api/token', async (req, res) => {
 
     // sign a new JWT
     const token = await SignAsync({ email: user[0] }, TOKEN_SECRET, {
-      expiresIn: '10s'
+      expiresIn: EXPIRY_TIME
     });
 
     // generate a new refrest token
