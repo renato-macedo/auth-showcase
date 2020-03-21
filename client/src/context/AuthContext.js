@@ -1,6 +1,5 @@
 import React, { createContext, useReducer } from 'react';
 import AuthReducer from './AuthReducer';
-import { useHistory, useLocation } from 'react-router-dom';
 
 const AuthContext = createContext();
 export { AuthContext };
@@ -9,20 +8,18 @@ const initialState = {
   isAuthenticated: false,
   token: '',
   data: [],
-  error: ''
+  error: '',
+  email: '',
+  loading: true
 };
 
 export default function AuthProvider(props) {
-  let history = useHistory();
-  let location = useLocation();
-
-  let { from } = location.state || { from: { pathname: '/home' } };
   const [state, dispatch] = useReducer(AuthReducer, initialState);
 
-  const { isAuthenticated, token, data, error } = state;
+  const { isAuthenticated, token, data, error, loading, email } = state;
 
   async function login({ email, password, remember }) {
-    const response = await fetch('http://localhost:8080/login', {
+    const response = await fetch('http://localhost:8080/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, remember })
@@ -33,14 +30,13 @@ export default function AuthProvider(props) {
     if (data.token) {
       dispatch({
         type: 'AUTH',
-        payload: data.token
+        payload: data
       });
-      history.replace(from);
     }
   }
 
   async function getData() {
-    const response = await fetch('http://localhost:8080/user', {
+    const response = await fetch('http://localhost:8080/api/user', {
       method: 'GET',
       headers: { Authorization: token }
     });
@@ -55,19 +51,12 @@ export default function AuthProvider(props) {
       return;
     }
     if (data.error) {
-      await refreshToken();
+      await refreshToken(true);
     }
   }
 
-  async function logout() {
-    await fetch('http://localhost:8080/logout');
-    dispatch({
-      type: 'LOGOUT'
-    });
-  }
-
-  async function refreshToken() {
-    const response = await fetch('http://localhost:8080/token');
+  async function refreshToken(logoutOnError = false) {
+    const response = await fetch('http://localhost:8080/api/token');
 
     const data = await response.json();
 
@@ -76,19 +65,45 @@ export default function AuthProvider(props) {
         type: 'ERROR',
         payload: data.error + ' Logging out'
       });
-      setTimeout(logout, 2000);
+      if (logoutOnError) {
+        setTimeout(logout, 2000);
+      }
+
+      return;
     }
 
     if (data.token) {
       dispatch({
         type: 'AUTH',
-        payload: data.token
+        payload: data
       });
     }
   }
+
+  async function logout() {
+    await fetch('http://localhost:8080/api/logout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    dispatch({
+      type: 'LOGOUT'
+    });
+  }
+
   return (
     <AuthContext.Provider
-      value={{ login, isAuthenticated, getData, data, error, logout }}
+      value={{
+        login,
+        isAuthenticated,
+        email,
+        getData,
+        data,
+        error,
+        logout,
+        loading,
+        refreshToken
+      }}
     >
       {props.children}
     </AuthContext.Provider>

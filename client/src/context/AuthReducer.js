@@ -4,25 +4,31 @@ const AuthReducer = (state, action) => {
       return {
         ...state,
         isAuthenticated: true,
-        token: action.payload
+        token: action.payload.token,
+        email: action.payload.email,
+        error: '',
+        loading: false
       };
 
     case 'DATA':
       return {
         ...state,
-        data: [...state.data, action.payload]
+        data: [...state.data, action.payload],
+        loading: false
       };
     case 'ERROR':
       return {
         ...state,
-        error: action.payload
+        error: action.payload,
+        loading: false
       };
     case 'LOGOUT':
       return {
         isAuthenticated: false,
         token: '',
         data: [],
-        error: ''
+        error: '',
+        loading: false
       };
     default:
       return state;

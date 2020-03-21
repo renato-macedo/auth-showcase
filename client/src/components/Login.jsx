@@ -1,19 +1,28 @@
-import React from 'react';
-import { useState } from 'react';
-import { useContext } from 'react';
+import React, { useState, useContext } from 'react';
+
 import { AuthContext } from '../context/AuthContext';
 import lock from '../assets/lock.png';
 
-export default function Login() {
+export default function Login(props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
 
-  const { login } = useContext(AuthContext);
+  const { login, refreshToken, isAuthenticated } = useContext(AuthContext);
   async function onSubmit(e) {
     e.preventDefault();
-    login({ email, password, remember });
+    if (login && password) {
+      login({ email, password, remember });
+    }
   }
+
+  // useEffect(() => {
+  //   refreshToken();
+  // }, []);
+  if (isAuthenticated) {
+    props.history.push('/home');
+  }
+
   return (
     <form className="form-signin text-center" onSubmit={onSubmit}>
       <img className="mb-4" src={lock} alt="" width="72" height="72"></img>
@@ -28,6 +37,7 @@ export default function Login() {
         placeholder="Email address"
         value={email}
         autoFocus={true}
+        required={true}
       />
       <label htmlFor="inputPassword" className="sr-only">
         Password
@@ -39,6 +49,7 @@ export default function Login() {
         className="form-control"
         placeholder="Password"
         value={password}
+        required={true}
       />
       <div className="checkbox mb-3">
         <label>
